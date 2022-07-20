@@ -4,32 +4,30 @@ import com.softwareloop.mybatis.generator.plugins.GeneratedCrudPlugin.InternalTy
 import java.util.Map;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.CompilationUnit;
-import org.mybatis.generator.api.dom.java.Field;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 import org.mybatis.generator.api.dom.java.Interface;
 import org.mybatis.generator.api.dom.java.JavaVisibility;
 import org.mybatis.generator.api.dom.java.Method;
 import org.mybatis.generator.api.dom.java.Parameter;
-import org.mybatis.generator.api.dom.java.TopLevelClass;
 
 public class GeneratedService {
-    private Map<InternalType, FullyQualifiedJavaType> fqjts;
+    private Map<InternalType, FullyQualifiedJavaType> types;
     
     
-    public GeneratedService(Map<InternalType, FullyQualifiedJavaType> fqjts){
-        this.fqjts = fqjts;
+    public GeneratedService(Map<InternalType, FullyQualifiedJavaType> types){
+        this.types = types;
     }
     
     public CompilationUnit generated(IntrospectedTable introspectedTable) {
        
-        FullyQualifiedJavaType serviceType = fqjts.get(InternalType.ATTR_SERVICE_TYPE);
+        FullyQualifiedJavaType serviceType = types.get(InternalType.ATTR_SERVICE_TYPE);
     
         Interface service = new Interface(serviceType.getFullyQualifiedName());
         service.setVisibility(JavaVisibility.PUBLIC);
     
-        service.addImportedType(fqjts.get(InternalType.ATTR_PAGERESPONSE_TYPE));
-        service.addImportedType(fqjts.get(InternalType.ATTR_PAGEREQUEST_TYPE));
-        service.addImportedType(fqjts.get(InternalType.ATTR_PO_TYPE));
+        service.addImportedType(types.get(InternalType.ATTR_PAGERESPONSE_TYPE));
+        service.addImportedType(types.get(InternalType.ATTR_PAGEREQUEST_TYPE));
+        service.addImportedType(types.get(InternalType.ATTR_DTO_TYPE));
     
     
         service.addMethod(getQueryMethod());
@@ -46,10 +44,10 @@ public class GeneratedService {
         
         method.setReturnType(new FullyQualifiedJavaType("java.lang.Boolean"));
     
-        FullyQualifiedJavaType poType = fqjts.get(InternalType.ATTR_PO_TYPE);
+        FullyQualifiedJavaType dtoType = types.get(InternalType.ATTR_DTO_TYPE);
         
-        String poRefName = GeneratedCrudPlugin.lowerFirstChar(poType.getShortName());
-        Parameter parameter = new Parameter(poType, poRefName);
+        String dtoRefName = GeneratedCrudPlugin.lowerFirstChar(dtoType.getShortName());
+        Parameter parameter = new Parameter(dtoType, dtoRefName);
         
         method.addParameter(parameter);
         return method;
@@ -74,10 +72,10 @@ public class GeneratedService {
     
         method.setReturnType(new FullyQualifiedJavaType("java.lang.Boolean"));
     
-        FullyQualifiedJavaType poType = fqjts.get(InternalType.ATTR_PO_TYPE);
+        FullyQualifiedJavaType dtoType = types.get(InternalType.ATTR_DTO_TYPE);
     
-        String poRefName = GeneratedCrudPlugin.lowerFirstChar(poType.getShortName());
-        Parameter parameter = new Parameter(poType, poRefName);
+        String dtoRefName = GeneratedCrudPlugin.lowerFirstChar(dtoType.getShortName());
+        Parameter parameter = new Parameter(dtoType, dtoRefName);
     
         method.addParameter(parameter);
         return method;
@@ -88,8 +86,8 @@ public class GeneratedService {
         method.setVisibility(JavaVisibility.PUBLIC);
         method.setName("queryByPage");
         
-        method.setReturnType(new FullyQualifiedJavaType(fqjts.get(InternalType.ATTR_PAGERESPONSE_TYPE).getShortName()));
-        method.addParameter(new Parameter(new FullyQualifiedJavaType(fqjts.get(InternalType.ATTR_PAGEREQUEST_TYPE).getShortName()), "pageParam"));
+        method.setReturnType(new FullyQualifiedJavaType(types.get(InternalType.ATTR_PAGERESPONSE_TYPE).getShortName()));
+        method.addParameter(new Parameter(new FullyQualifiedJavaType(types.get(InternalType.ATTR_PAGEREQUEST_TYPE).getShortName()), "pageParam"));
         return method;
     }
  

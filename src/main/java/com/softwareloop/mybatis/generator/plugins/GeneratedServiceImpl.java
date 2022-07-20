@@ -6,36 +6,40 @@ import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.CompilationUnit;
 import org.mybatis.generator.api.dom.java.Field;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
-import org.mybatis.generator.api.dom.java.Interface;
 import org.mybatis.generator.api.dom.java.JavaVisibility;
 import org.mybatis.generator.api.dom.java.Method;
 import org.mybatis.generator.api.dom.java.Parameter;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
 
 public class GeneratedServiceImpl {
-    private Map<InternalType, FullyQualifiedJavaType> fqjts;
+    private Map<InternalType, FullyQualifiedJavaType> types;
     
     
-    public GeneratedServiceImpl(Map<InternalType, FullyQualifiedJavaType> fqjts){
-        this.fqjts = fqjts;
+    public GeneratedServiceImpl(Map<InternalType, FullyQualifiedJavaType> types){
+        this.types = types;
     }
     
     public CompilationUnit generated(IntrospectedTable introspectedTable) {
        
-        FullyQualifiedJavaType serviceImplType = fqjts.get(InternalType.ATTR_SERVICE_IMPL_TYPE);
-        FullyQualifiedJavaType serviceType = fqjts.get(InternalType.ATTR_SERVICE_TYPE);
+        FullyQualifiedJavaType serviceImplType = types.get(InternalType.ATTR_SERVICE_IMPL_TYPE);
+        FullyQualifiedJavaType serviceType = types.get(InternalType.ATTR_SERVICE_TYPE);
     
         TopLevelClass serviceImpl = new TopLevelClass(serviceImplType.getFullyQualifiedName());
         serviceImpl.addSuperInterface(serviceType);
         
         serviceImpl.setVisibility(JavaVisibility.PUBLIC);
+        
+        
     
-        serviceImpl.addImportedType(fqjts.get(InternalType.ATTR_PAGERESPONSE_TYPE));
-        serviceImpl.addImportedType(fqjts.get(InternalType.ATTR_PAGEREQUEST_TYPE));
-        serviceImpl.addImportedType(fqjts.get(InternalType.ATTR_PO_TYPE));
+        serviceImpl.addImportedType(types.get(InternalType.ATTR_PAGERESPONSE_TYPE));
+        serviceImpl.addImportedType(types.get(InternalType.ATTR_PAGEREQUEST_TYPE));
+        serviceImpl.addImportedType(types.get(InternalType.ATTR_PO_TYPE));
+        serviceImpl.addImportedType("org.ffm.saas.smarterp.common.util.BeanUtilsWrapper");
         serviceImpl.addImportedType(serviceType);
-        serviceImpl.addImportedType(fqjts.get(InternalType.ATTR_DAO_TYPE));
+        serviceImpl.addImportedType(types.get(InternalType.ATTR_DAO_TYPE));
+        serviceImpl.addImportedType(types.get(InternalType.ATTR_DTO_TYPE));
         serviceImpl.addImportedType("com.github.pagehelper.PageHelper");
+        serviceImpl.addImportedType("com.github.pagehelper.PageInfo");
         serviceImpl.addImportedType("com.github.pagehelper.PageInfo");
         serviceImpl.addImportedType("java.util.List");
         serviceImpl.addImportedType("lombok.extern.slf4j.Slf4j");
@@ -59,7 +63,7 @@ public class GeneratedServiceImpl {
     }
     
     private Field getField(){
-        FullyQualifiedJavaType daoType = fqjts.get(InternalType.ATTR_DAO_TYPE);
+        FullyQualifiedJavaType daoType = types.get(InternalType.ATTR_DAO_TYPE);
         String daoTypeRefName = GeneratedCrudPlugin.lowerFirstChar(daoType.getShortName());
         
         Field field = new Field();
@@ -78,20 +82,21 @@ public class GeneratedServiceImpl {
         
         method.setReturnType(new FullyQualifiedJavaType("java.lang.Boolean"));
     
-        FullyQualifiedJavaType poType = fqjts.get(InternalType.ATTR_PO_TYPE);
-        FullyQualifiedJavaType daoType = fqjts.get(InternalType.ATTR_DAO_TYPE);
+        FullyQualifiedJavaType poType = types.get(InternalType.ATTR_PO_TYPE);
+        FullyQualifiedJavaType dtoType = types.get(InternalType.ATTR_DTO_TYPE);
+        FullyQualifiedJavaType daoType = types.get(InternalType.ATTR_DAO_TYPE);
         
-        String poRefName = GeneratedCrudPlugin.lowerFirstChar(poType.getShortName());
+        String dtoRefName = GeneratedCrudPlugin.lowerFirstChar(dtoType.getShortName());
         String daoRefName = GeneratedCrudPlugin.lowerFirstChar(daoType.getShortName());
         
-        Parameter parameter = new Parameter(poType, poRefName);
+        Parameter parameter = new Parameter(dtoType, dtoRefName);
         method.addParameter(parameter);
     
-        method.addBodyLine(String.format("if (%s == null){", poRefName));
+        method.addBodyLine(String.format("if (%s == null){", dtoRefName));
         method.addBodyLine(String.format("throw new AppException(\"%s 参数不能为空!\");", name));
         method.addBodyLine("}");
         
-        method.addBodyLine(String.format("return %s.insert(%s) > 0 ? true : false;", daoRefName, poRefName));
+        method.addBodyLine(String.format("return %s.insert(BeanUtilsWrapper.copy(%s, new %s())) > 0 ? true : false;", daoRefName, dtoRefName, poType.getShortName()));
         
         return method;
     }
@@ -107,7 +112,7 @@ public class GeneratedServiceImpl {
         Parameter parameter = new Parameter(new FullyQualifiedJavaType("java.lang.Integer"), "id");
         method.addParameter(parameter);
     
-        FullyQualifiedJavaType daoType = fqjts.get(InternalType.ATTR_DAO_TYPE);
+        FullyQualifiedJavaType daoType = types.get(InternalType.ATTR_DAO_TYPE);
     
         String daoRefName = GeneratedCrudPlugin.lowerFirstChar(daoType.getShortName());
     
@@ -128,23 +133,23 @@ public class GeneratedServiceImpl {
     
         method.setReturnType(new FullyQualifiedJavaType("java.lang.Boolean"));
     
-        FullyQualifiedJavaType poType = fqjts.get(InternalType.ATTR_PO_TYPE);
+        FullyQualifiedJavaType poType = types.get(InternalType.ATTR_PO_TYPE);
+        FullyQualifiedJavaType dtoType = types.get(InternalType.ATTR_DTO_TYPE);
     
-        String poRefName = GeneratedCrudPlugin.lowerFirstChar(poType.getShortName());
-        Parameter parameter = new Parameter(poType, poRefName);
+        String dtoRefName = GeneratedCrudPlugin.lowerFirstChar(dtoType.getShortName());
+        Parameter parameter = new Parameter(dtoType, dtoRefName);
     
         method.addParameter(parameter);
     
-        FullyQualifiedJavaType daoType = fqjts.get(InternalType.ATTR_DAO_TYPE);
+        FullyQualifiedJavaType daoType = types.get(InternalType.ATTR_DAO_TYPE);
         String daoRefName = GeneratedCrudPlugin.lowerFirstChar(daoType.getShortName());
    
     
-        method.addBodyLine(String.format("if (%s == null){", poRefName));
+        method.addBodyLine(String.format("if (%s == null){", dtoRefName));
         method.addBodyLine(String.format("throw new AppException(\"%s 参数不能为空!\");", name));
         method.addBodyLine("}");
     
-        method.addBodyLine(String.format("return %s.updateByPrimaryKey(%s) > 0 ? true : false;", daoRefName, poRefName));
-        
+        method.addBodyLine(String.format("return %s.updateByPrimaryKey(BeanUtilsWrapper.copy(%s, new %s())) > 0 ? true : false;", daoRefName, dtoRefName, poType.getShortName()));
         return method;
     }
     
@@ -154,19 +159,24 @@ public class GeneratedServiceImpl {
         method.setName("queryByPage");
         method.addAnnotation("@Override");
         
-        method.setReturnType(new FullyQualifiedJavaType(fqjts.get(InternalType.ATTR_PAGERESPONSE_TYPE).getShortName()));
-        method.addParameter(new Parameter(new FullyQualifiedJavaType(fqjts.get(InternalType.ATTR_PAGEREQUEST_TYPE).getShortName()), "pageParam"));
+        method.setReturnType(new FullyQualifiedJavaType(types.get(InternalType.ATTR_PAGERESPONSE_TYPE).getShortName()));
+        method.addParameter(new Parameter(new FullyQualifiedJavaType(types.get(InternalType.ATTR_PAGEREQUEST_TYPE).getShortName()), "pageParam"));
     
-        FullyQualifiedJavaType poType = fqjts.get(InternalType.ATTR_PO_TYPE);
+        FullyQualifiedJavaType poType = types.get(InternalType.ATTR_PO_TYPE);
+        FullyQualifiedJavaType dtoType = types.get(InternalType.ATTR_DTO_TYPE);
         String poRefName = GeneratedCrudPlugin.lowerFirstChar(poType.getShortName());
     
-        FullyQualifiedJavaType daoType = fqjts.get(InternalType.ATTR_DAO_TYPE);
+        FullyQualifiedJavaType daoType = types.get(InternalType.ATTR_DAO_TYPE);
         String daoRefName = GeneratedCrudPlugin.lowerFirstChar(daoType.getShortName());
         
         method.addBodyLine("PageHelper.startPage(pageParam.getPageNum(),pageParam.getPageSize());");
         method.addBodyLine(String.format("List<%s> %sList = %s.selectAll();",poType.getShortName(), poRefName, daoRefName));
-        method.addBodyLine(String.format("PageInfo<%s> pageInfo = new PageInfo<>(%sList);", poType.getShortName(), poRefName));
-        method.addBodyLine(String.format("return PageResponse.<%s>builder(pageInfo);", poType.getShortName()));
+        
+        method.addBodyLine(String.format("List<%s> dtoList = %sList.stream().map(po ->{",dtoType.getShortName(), poRefName));
+        method.addBodyLine(String.format("return BeanUtilsWrapper.copy(po, new %s());", dtoType.getShortName()));
+        method.addBodyLine("}).collect(Collectors.toList());");
+        method.addBodyLine(String.format("PageInfo<%s> pageInfo = new PageInfo<>(dtoList);", dtoType.getShortName()));
+        method.addBodyLine(String.format("return PageResponse.<%s>builder(pageInfo);", dtoType.getShortName()));
         return method;
     }
  

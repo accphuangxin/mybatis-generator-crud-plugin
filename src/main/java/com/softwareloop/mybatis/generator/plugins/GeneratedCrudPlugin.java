@@ -16,7 +16,7 @@ import org.mybatis.generator.config.PropertyRegistry;
 public class GeneratedCrudPlugin extends PluginAdapter {
     private String packagePath;
     private String filterColums;
-    private Map<InternalType, FullyQualifiedJavaType> fqjts = new HashMap<>();
+    private Map<InternalType, FullyQualifiedJavaType> types = new HashMap<>();
     
     
     @Override
@@ -42,28 +42,28 @@ public class GeneratedCrudPlugin extends PluginAdapter {
     }
     
     private GeneratedJavaFile getController(IntrospectedTable introspectedTable){
-        GeneratedController generatedController = new GeneratedController(this.fqjts);
+        GeneratedController generatedController = new GeneratedController(this.types);
         CompilationUnit controller = generatedController.generated(introspectedTable);
         return  new GeneratedJavaFile(controller, context.getJavaModelGeneratorConfiguration().getTargetProject(), context.getProperty(
             PropertyRegistry.CONTEXT_JAVA_FILE_ENCODING), this.context.getJavaFormatter());
     }
     
     private GeneratedJavaFile getDto(IntrospectedTable introspectedTable){
-        GeneratedDto generatedDto = new GeneratedDto(this.fqjts, this.filterColums);
+        GeneratedDto generatedDto = new GeneratedDto(this.types, this.filterColums);
         CompilationUnit dto = generatedDto.generated(introspectedTable);
         return  new GeneratedJavaFile(dto, context.getJavaModelGeneratorConfiguration().getTargetProject(), context.getProperty(
             PropertyRegistry.CONTEXT_JAVA_FILE_ENCODING), this.context.getJavaFormatter());
     }
     
     private GeneratedJavaFile getService(IntrospectedTable introspectedTable){
-        GeneratedService generatedService = new GeneratedService(this.fqjts);
+        GeneratedService generatedService = new GeneratedService(this.types);
         CompilationUnit service = generatedService.generated(introspectedTable);
         return  new GeneratedJavaFile(service, context.getJavaModelGeneratorConfiguration().getTargetProject(), context.getProperty(
             PropertyRegistry.CONTEXT_JAVA_FILE_ENCODING), this.context.getJavaFormatter());
     }
     
     private GeneratedJavaFile getServiceImpl(IntrospectedTable introspectedTable){
-        GeneratedServiceImpl generatedServiceImpl = new GeneratedServiceImpl(this.fqjts);
+        GeneratedServiceImpl generatedServiceImpl = new GeneratedServiceImpl(this.types);
         CompilationUnit serviceImpl = generatedServiceImpl.generated(introspectedTable);
         return  new GeneratedJavaFile(serviceImpl, context.getJavaModelGeneratorConfiguration().getTargetProject(), context.getProperty(
             PropertyRegistry.CONTEXT_JAVA_FILE_ENCODING), this.context.getJavaFormatter());
@@ -77,39 +77,39 @@ public class GeneratedCrudPlugin extends PluginAdapter {
         sb.append(".model.");
         sb.append(name);
         sb.append("Dto");
-        fqjts.put(InternalType.ATTR_DTO_TYPE, new FullyQualifiedJavaType(sb.toString()));
+        types.put(InternalType.ATTR_DTO_TYPE, new FullyQualifiedJavaType(sb.toString()));
         
         sb.setLength(0);
         sb.append(basePackage);
         sb.append(".controller.");
         sb.append(name);
         sb.append("Controller");
-        fqjts.put(InternalType.ATTR_CONTROLLER_TYPE, new FullyQualifiedJavaType(sb.toString()));
+        types.put(InternalType.ATTR_CONTROLLER_TYPE, new FullyQualifiedJavaType(sb.toString()));
     
         sb.setLength(0);
         sb.append(basePackage);
         sb.append(".service.");
         sb.append(name);
         sb.append("Service");
-        fqjts.put(InternalType.ATTR_SERVICE_TYPE, new FullyQualifiedJavaType(sb.toString()));
+        types.put(InternalType.ATTR_SERVICE_TYPE, new FullyQualifiedJavaType(sb.toString()));
         
         sb.setLength(0);
         sb.append(basePackage);
         sb.append(".service.impl.");
         sb.append(name);
         sb.append("ServiceImpl");
-        fqjts.put(InternalType.ATTR_SERVICE_IMPL_TYPE, new FullyQualifiedJavaType(sb.toString()));
+        types.put(InternalType.ATTR_SERVICE_IMPL_TYPE, new FullyQualifiedJavaType(sb.toString()));
     
-        fqjts.put(InternalType.ATTR_PO_TYPE, new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
-        fqjts.put(InternalType.ATTR_DAO_TYPE, new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType()));
+        types.put(InternalType.ATTR_PO_TYPE, new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
+        types.put(InternalType.ATTR_DAO_TYPE, new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType()));
     
-        FullyQualifiedJavaType pageRequestFqjy = new FullyQualifiedJavaType("org.ffm.saas.smarterp.common.model.PageRequest");
-        pageRequestFqjy.addTypeArgument(fqjts.get(InternalType.ATTR_PO_TYPE));
-        fqjts.put(InternalType.ATTR_PAGEREQUEST_TYPE, pageRequestFqjy);
+        FullyQualifiedJavaType pageRequestType = new FullyQualifiedJavaType("org.ffm.saas.smarterp.common.model.PageRequest");
+        pageRequestType.addTypeArgument(types.get(InternalType.ATTR_DTO_TYPE));
+        types.put(InternalType.ATTR_PAGEREQUEST_TYPE, pageRequestType);
         
-        FullyQualifiedJavaType pageResponseFqjy = new FullyQualifiedJavaType("org.ffm.saas.smarterp.common.model.PageResponse");
-        pageResponseFqjy.addTypeArgument(fqjts.get(InternalType.ATTR_PO_TYPE));
-        fqjts.put(InternalType.ATTR_PAGERESPONSE_TYPE, pageResponseFqjy);
+        FullyQualifiedJavaType pageResponseType = new FullyQualifiedJavaType("org.ffm.saas.smarterp.common.model.PageResponse");
+        pageResponseType.addTypeArgument(types.get(InternalType.ATTR_DTO_TYPE));
+        types.put(InternalType.ATTR_PAGERESPONSE_TYPE, pageResponseType);
     }
     
     

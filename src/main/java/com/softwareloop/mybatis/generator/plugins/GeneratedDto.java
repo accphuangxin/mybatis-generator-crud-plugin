@@ -17,18 +17,18 @@ import org.mybatis.generator.api.dom.java.Parameter;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
 
 public class GeneratedDto {
-    private Map<InternalType, FullyQualifiedJavaType> fqjts;
+    private Map<InternalType, FullyQualifiedJavaType> types;
     private String filterColums;
     
-    public GeneratedDto(Map<InternalType, FullyQualifiedJavaType> fqjts, String filterColums){
-        this.fqjts = fqjts;
+    public GeneratedDto(Map<InternalType, FullyQualifiedJavaType> types, String filterColums){
+        this.types = types;
         this.filterColums = filterColums;
     }
   
     public CompilationUnit generated(IntrospectedTable introspectedTable) {
         String domainObjectName = introspectedTable.getFullyQualifiedTable().getDomainObjectName();
         
-        TopLevelClass dto = new TopLevelClass(fqjts.get(InternalType.ATTR_DTO_TYPE));
+        TopLevelClass dto = new TopLevelClass(types.get(InternalType.ATTR_DTO_TYPE));
         dto.setVisibility(JavaVisibility.PUBLIC);
         
         Iterator<IntrospectedColumn> var9 = filterField(introspectedTable.getAllColumns()).iterator();
