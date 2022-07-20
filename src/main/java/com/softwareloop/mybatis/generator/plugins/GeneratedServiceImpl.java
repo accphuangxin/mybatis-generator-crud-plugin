@@ -38,6 +38,7 @@ public class GeneratedServiceImpl {
         serviceImpl.addImportedType(serviceType);
         serviceImpl.addImportedType(types.get(InternalType.ATTR_DAO_TYPE));
         serviceImpl.addImportedType(types.get(InternalType.ATTR_DTO_TYPE));
+        serviceImpl.addImportedType("java.util.stream.Collectors");
         serviceImpl.addImportedType("com.github.pagehelper.PageHelper");
         serviceImpl.addImportedType("com.github.pagehelper.PageInfo");
         serviceImpl.addImportedType("com.github.pagehelper.PageInfo");
